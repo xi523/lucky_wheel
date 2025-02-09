@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>午餐选择转盘</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 4s ease-out;
+            background: conic-gradient(
+                #FF6B6B 0deg 72deg,
+                #4ECDC4 72deg 144deg,
+                #45B7D1 144deg 216deg,
+                #96CEB4 216deg 288deg,
+                #D4A5A5 288deg 360deg
+            );
+            border: 2px solid #333;
+        }
+
+        .section-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform-origin: 0 0;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            width: 160px;
+            margin-left: -80px;
+            pointer-events: none;
+            height: 20px;
+            margin-top: -10px;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid red;
+            z-index: 2;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">今天吃什么</h1>
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel"></div>
+        </div>
+        <div class="controls">
+            <button onclick="startRotation()">开始</button>
+            <button onclick="stopRotation()">停止</button>
+        </div>
+    </div>
+
+    <script>
+        const wheel = document.getElementById('wheel');
+        const sections = [
+            { name: '麦当劳', color: '#FF6B6B' },
+            { name: '老乡鸡', color: '#4ECDC4' },
+            { name: '和府捞面', color: '#45B7D1' },
+            { name: '米村拌饭', color: '#96CEB4' },
+            { name: '减肥不吃了', color: '#D4A5A5' }
+        ];
+
+        let isSpinning = false;
+        let rotationInterval;
+        let currentRotation = 0;
+
+        function createWheel() {
+            sections.forEach((section, index) => {
+                const text = document.createElement('div');
+                text.className = 'section-text';
+                text.textContent = section.name;
+                const angle = index * 72 + 36; // 每个扇形的中心角度
+                const radius = 140; // 文字距离圆心的距离
+                text.style.transform = `
+                    rotate(${angle}deg)
+                    translate(${radius}px)
+                    rotate(-${angle}deg)
+                `;
+                wheel.appendChild(text);
+            });
+        }
+
+        function startRotation() {
+            if (!isSpinning) {
+                isSpinning = true;
+                rotationInterval = setInterval(() => {
+                    currentRotation += 5;
+                    wheel.style.transform = `rotate(${currentRotation}deg)`;
+                }, 50);
+            }
+        }
+
+        function stopRotation() {
+            if (isSpinning) {
+                isSpinning = false;
+                clearInterval(rotationInterval);
+                
+                // 确保停在一个随机的区域
+                const randomDegree = Math.floor(Math.random() * 360);
+                const finalRotation = Math.ceil(currentRotation / 360) * 360 + randomDegree;
+                
+                wheel.style.transform = `rotate(${finalRotation}deg)`;
+                currentRotation = finalRotation;
+            }
+        }
+
+        // 初始化转盘
+        createWheel();
+    </script>
+</body>
+</html>
